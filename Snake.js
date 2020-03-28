@@ -145,3 +145,5 @@ console.log(f);
 
 // WORKS!
 */
+
+class Game () {}
