@@ -133,7 +133,7 @@ console.log(t);
 */
 
 class FoodTile extends Tile {
-  constructor(xTile = Math.floor(Math.random() * tileAmount), yTile  = Math.floor(Math.random() * tileAmount), bgColor, borderColor) {
+  constructor(xTile = Math.floor(Math.random() * tileAmount), yTile = Math.floor(Math.random() * tileAmount), bgColor, borderColor) {
     super(xTile, yTile, bgColor, borderColor);
   }
 }
@@ -146,19 +146,69 @@ console.log(f);
 // WORKS!
 */
 
+class Snake { // array of tiles
+  constructor () {
+    this.body = [[0,0]];
+    this.head = this.body[0];
+    this.tail = this.body.slice(1);
+    this.length = this.body.length;
+  }
+
+  move (direction) { // direction is a unit 2x1 array
+    this.body.push([this.head[0] + direction[0], this.head[1] + direction[1]]);
+  }
+
+  eat (food) {
+    if (!(food.posX === this.head[0] && this.posY === this.head[1])) {
+      this.body.pop();
+    }
+  }
+
+  /*
+    Umm... `move` and `eat` methods might be tricky to understand:
+    `move` always adds one unit length to the snake.
+    `eat` normally deletes this excess;
+    the only exception of this rule is when the snake eats a fruit.
+    In this case we don't want it to shrink.
+  */
+
+  doesntCollide () {
+    return this.tail.every(el => el[0] !== this.head[0] || el[1] !== this.head[1]);
+  } // the snake doesnt collide with itself if every element of its tail
+  // has different coordinates than its head
+
+  draw() {
+    const body = this.body;
+    body.forEach(
+      el => {
+        const index = body.indexOf(el);
+        const t = new Tile(...body[index]);
+        t.draw();
+      }
+    );
+  }
+};
+
 class Game {
   constructor () {}
 
   generateFood () {
-    const food = new FoodTile();
+    const food = new FoodTile(Math.floor(Math.random() * tileAmount), Math.floor(Math.random() * tileAmount));
     food.draw();
     return food;
   }
 
+  generateSnake () {
+    const snake = new Snake ();
+    snake.draw();
+    return snake;
+  };
+
   start () {
-    this.generateFood();
+    const f = this.generateFood();
+    const s = this.generateSnake();
   }
-}
+};
 
 const g = new Game();
 g.start()
