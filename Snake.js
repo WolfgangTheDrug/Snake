@@ -22,7 +22,6 @@ const yellowGreen = {
       '#F8DBD3'
     ]
 };
-
 const skyBlue = {
   dark:
     [
@@ -43,7 +42,6 @@ const skyBlue = {
       '#DEF8D3'
     ]
 };
-
 const slateBlue = {
   dark:
     [
@@ -64,7 +62,6 @@ const slateBlue = {
       '#D3F0F8'
     ]
 };
-
 const crimson = {
   dark:
     [
@@ -92,3 +89,16 @@ const pallette = {
   slateBlue: slateBlue,
   crimson: crimson
 };
+
+/* ******************* *
+ *   Pallette: STOP    *
+ * ******************* */
+
+ const tileSize = 12;  // highly composite number!
+ const tileAmount = 60; // highly composite number!
+ const boardSize = tileSize * tileAmount; //highly composite number!
+
+ const canvas = document.querySelector('canvas');
+ canvas.width = boardSize;
+ canvas.height = boardSize;
+ const ctx = canvas.getContext('2d');
