@@ -102,3 +102,46 @@ const pallette = {
  canvas.width = boardSize;
  canvas.height = boardSize;
  const ctx = canvas.getContext('2d');
+
+ class Tile {
+   constructor(xTile = 0, yTile = 0, bgColor = pallette.yellowGreen.neutral[1], borderColor = pallette.yellowGreen.dark[1]) {
+     this.posX = xTile * tileSize; // xTile and yTile are numbers of Tile, not pixel
+     this.posY = yTile * tileSize; // but this.posX and this.posY are in pixels
+     this.width = tileSize;
+     this.height = tileSize;
+     this.bgColor = bgColor;
+     this.borderColor = borderColor;
+   }
+
+   draw () {
+     ctx.fillStyle = this.bgColor;
+     ctx.strokeStyle = this.borderColor;
+     ctx.lineWidth = 1;
+     ctx.beginPath();
+     ctx.rect(this.posX, this.posY, this.width, this.height);
+     ctx.fill();
+     ctx.stroke();
+   }
+ }
+
+/*
+const t = new Tile (12, 10);
+t.draw();
+console.log(t);
+
+// WORKS!
+*/
+
+class FoodTile extends Tile {
+  constructor(xTile = Math.floor(Math.random() * tileAmount), yTile  = Math.floor(Math.random() * tileAmount), bgColor, borderColor) {
+    super(xTile, yTile, bgColor, borderColor);
+  }
+}
+
+/*
+const f = new FoodTile ();
+f.draw();
+console.log(f);
+
+// WORKS!
+*/
