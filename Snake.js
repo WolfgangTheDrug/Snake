@@ -146,4 +146,19 @@ console.log(f);
 // WORKS!
 */
 
-class Game () {}
+class Game {
+  constructor () {}
+
+  generateFood () {
+    const food = new FoodTile();
+    food.draw();
+    return food;
+  }
+
+  start () {
+    this.generateFood();
+  }
+}
+
+const g = new Game();
+g.start()
