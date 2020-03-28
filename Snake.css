@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  border: 1px solid pink;
+  background: #7FE69B;
+}
