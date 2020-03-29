@@ -94,6 +94,7 @@ const pallette = {
  *   Pallette: STOP    *
  * ******************* */
 
+<<<<<<< HEAD
 const tileSize = 12;  // highly composite number!
 const tileAmount = 60; // highly composite number!
 const boardSize = tileSize * tileAmount; //highly composite number!
@@ -102,3 +103,73 @@ const canvas = document.querySelector('canvas');
 canvas.width = boardSize;
 canvas.height = boardSize;
 const ctx = canvas.getContext('2d');
+=======
+ const tileSize = 12;  // highly composite number!
+ const tileAmount = 60; // highly composite number!
+ const boardSize = tileSize * tileAmount; //highly composite number!
+
+ const canvas = document.querySelector('canvas');
+ canvas.width = boardSize;
+ canvas.height = boardSize;
+ const ctx = canvas.getContext('2d');
+
+ class Tile {
+   constructor(xTile = 0, yTile = 0, bgColor = pallette.yellowGreen.neutral[1], borderColor = pallette.yellowGreen.dark[1]) {
+     this.posX = xTile * tileSize; // xTile and yTile are numbers of Tile, not pixel
+     this.posY = yTile * tileSize; // but this.posX and this.posY are in pixels
+     this.width = tileSize;
+     this.height = tileSize;
+     this.bgColor = bgColor;
+     this.borderColor = borderColor;
+   }
+
+   draw () {
+     ctx.fillStyle = this.bgColor;
+     ctx.strokeStyle = this.borderColor;
+     ctx.lineWidth = 1;
+     ctx.beginPath();
+     ctx.rect(this.posX, this.posY, this.width, this.height);
+     ctx.fill();
+     ctx.stroke();
+   }
+ }
+
+/*
+const t = new Tile (12, 10);
+t.draw();
+console.log(t);
+
+// WORKS!
+*/
+
+class FoodTile extends Tile {
+  constructor(xTile = Math.floor(Math.random() * tileAmount), yTile  = Math.floor(Math.random() * tileAmount), bgColor, borderColor) {
+    super(xTile, yTile, bgColor, borderColor);
+  }
+}
+
+/*
+const f = new FoodTile ();
+f.draw();
+console.log(f);
+
+// WORKS!
+*/
+
+class Game {
+  constructor () {}
+
+  generateFood () {
+    const food = new FoodTile();
+    food.draw();
+    return food;
+  }
+
+  start () {
+    this.generateFood();
+  }
+}
+
+const g = new Game();
+g.start()
+>>>>>>> parent of 09e7f8a... Snake class with move, eat and doesntCollide methods
