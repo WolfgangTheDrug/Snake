@@ -94,16 +94,6 @@ const pallette = {
  *   Pallette: STOP    *
  * ******************* */
 
-<<<<<<< HEAD
-const tileSize = 12;  // highly composite number!
-const tileAmount = 60; // highly composite number!
-const boardSize = tileSize * tileAmount; //highly composite number!
-
-const canvas = document.querySelector('canvas');
-canvas.width = boardSize;
-canvas.height = boardSize;
-const ctx = canvas.getContext('2d');
-=======
  const tileSize = 12;  // highly composite number!
  const tileAmount = 60; // highly composite number!
  const boardSize = tileSize * tileAmount; //highly composite number!
@@ -146,6 +136,10 @@ class FoodTile extends Tile {
   constructor(xTile = Math.floor(Math.random() * tileAmount), yTile  = Math.floor(Math.random() * tileAmount), bgColor, borderColor) {
     super(xTile, yTile, bgColor, borderColor);
   }
+
+  get position () {
+    return [this.posX, this.posY].map(el => el/tileSize);
+  }
 }
 
 /*
@@ -156,20 +150,131 @@ console.log(f);
 // WORKS!
 */
 
-class Game {
-  constructor () {}
-
-  generateFood () {
-    const food = new FoodTile();
-    food.draw();
-    return food;
+class Snake {
+  constructor () {
+    this.body = [[0,0]];
+    this.length = this.body.length;
+    this.direction = [1, 0];
+    this.elongate = false;
   }
 
-  start () {
-    this.generateFood();
+  get position () {
+    return this.body[0]//.map(el => el/tileSize);
+  }
+
+  draw () {
+    this.body.forEach(el => new Tile(...el).draw());
+  }
+
+  updateLength () {
+    this.length = this.body.length;
+  }
+
+  addHead () {
+    const lastIndex = this.body.length - 1;
+    this.body.unshift([this.body[lastIndex][0] + this.direction[0], this.body[lastIndex][1] + this.direction[1]]);
+    if (this.body[0][0] >= tileAmount) {
+      this.body[0][0] = 0;
+    } else if (this.body[0][0] < 0) {
+      this.body[0][0] = tileAmount;
+    } else if (this.body[0][1] >= tileAmount) {
+      this.body[0][1] = 0;
+    } else if (this.body[0][1] < 0) {
+      this.body[0] = [this.body[0][0], tileAmount];
+    }
+
+  }
+
+  removeLast () {
+    this.body.pop();
+  }
+
+  move (didntEat = true) {
+    this.addHead();
+    if(!this.elongate){
+      this.removeLast()
+    };
+    this.updateLength();
   }
 }
 
+class Game {
+  constructor () {
+    this.snake = new Snake();
+    this.snakePosition = this.snake.position;
+    this.foodIsGenerated = false;
+    this.food = null;
+    this.foodPosition = null;
+  }
+
+  generateFood () {
+    const food = new FoodTile();
+    this.foodIsGenerated = true;
+    this.food = food;
+    this.foodPosition = food.position;
+    this.snake.elongate = false;
+    this.food.draw();
+  }
+
+  eatFood () {
+    if (this.snakePosition[0] === this.foodPosition[0] && this.snakePosition[1] === this.foodPosition[1]) {
+      this.foodIsGenerated = false;
+      this.food = null;
+      this.foodPosition = null;
+      this.snake.elongate = true;
+    }
+  }
+
+  start () {
+    this.snake.draw();
+    this.foodIsGenerated? this.foodIsGenerated = true : this.generateFood();
+  }
+
+  play () {
+    this.foodIsGenerated? this.foodIsGenerated = true : this.generateFood();
+    this.snake.move();
+    this.snakePosition = this.snake.position;
+    this.eatFood();
+    this.snake.draw();
+    if(this.foodIsGenerated) {
+      this.food.draw();
+    }
+  }
+}
+
+
+document.onkeydown = function(event) {
+  switch (event.keyCode) {
+    case 37:
+      g.snake.direction = [-1, 0];
+      break;
+    case 38:
+      g.snake.direction = [0, -1];
+      break;
+    case 39:
+      g.snake.direction = [1, 0];
+      break;
+    case 40:
+      g.snake.direction = [0, 1];
+      break;
+  }
+};
+
 const g = new Game();
+
+let counter = 0;
+const animate = function () {
+  if(++counter % 6){
+    requestAnimationFrame(animate);
+    counter %= 6;
+    return false;
+  }
+  ctx.clearRect(0, 0, boardSize, boardSize);
+  g.play();
+  requestAnimationFrame(animate);
+}
+
+
 g.start()
->>>>>>> parent of 09e7f8a... Snake class with move, eat and doesntCollide methods
+
+animate();
