@@ -150,99 +150,6 @@ console.log(f);
 // WORKS!
 */
 
-class Snake {
-  constructor () {
-    this.body = [[0,0]];
-    this.length = this.body.length;
-    this.direction = [1, 0];
-    this.elongate = false;
-  }
-
-  get position () {
-    return this.body[0]//.map(el => el/tileSize);
-  }
-
-  draw () {
-    this.body.forEach(el => new Tile(...el).draw());
-  }
-
-  updateLength () {
-    this.length = this.body.length;
-  }
-
-  addHead () {
-    const lastIndex = this.body.length - 1;
-    this.body.unshift([this.body[lastIndex][0] + this.direction[0], this.body[lastIndex][1] + this.direction[1]]);
-    if (this.body[0][0] >= tileAmount) {
-      this.body[0][0] = 0;
-    } else if (this.body[0][0] < 0) {
-      this.body[0][0] = tileAmount;
-    } else if (this.body[0][1] >= tileAmount) {
-      this.body[0][1] = 0;
-    } else if (this.body[0][1] < 0) {
-      this.body[0] = [this.body[0][0], tileAmount];
-    }
-
-  }
-
-  removeLast () {
-    this.body.pop();
-  }
-
-  move (didntEat = true) {
-    this.addHead();
-    if(!this.elongate){
-      this.removeLast()
-    };
-    this.updateLength();
-  }
-}
-
-class Game {
-  constructor () {
-    this.snake = new Snake();
-    this.snakePosition = this.snake.position;
-    this.foodIsGenerated = false;
-    this.food = null;
-    this.foodPosition = null;
-  }
-
-  generateFood () {
-    const food = new FoodTile();
-    this.foodIsGenerated = true;
-    this.food = food;
-    this.foodPosition = food.position;
-    this.snake.elongate = false;
-    this.food.draw();
-  }
-
-  eatFood () {
-    if (this.snakePosition[0] === this.foodPosition[0] && this.snakePosition[1] === this.foodPosition[1]) {
-      this.foodIsGenerated = false;
-      this.food = null;
-      this.foodPosition = null;
-      this.snake.elongate = true;
-    }
-  }
-
-  start () {
-    this.snake.draw();
-    this.foodIsGenerated? this.foodIsGenerated = true : this.generateFood();
-  }
-
-  play () {
-    this.foodIsGenerated? this.foodIsGenerated = true : this.generateFood();
-    this.snake.move();
-    this.snakePosition = this.snake.position;
-    this.eatFood();
-    this.snake.draw();
-    if(this.foodIsGenerated) {
-      this.food.draw();
-    }
-  }
-}
-
-
 document.onkeydown = function(event) {
   switch (event.keyCode) {
     case 37:
@@ -260,8 +167,8 @@ document.onkeydown = function(event) {
   }
 };
 
-const g = new Game();
 
+/*
 let counter = 0;
 const animate = function () {
   if(++counter % 6){
@@ -273,8 +180,53 @@ const animate = function () {
   g.play();
   requestAnimationFrame(animate);
 }
+*/
 
 
-g.start()
+let stop = false;
+let frameCount = 0;
+let fps, fpsInterval, startTime, now, then, elapsed;
 
-animate();
+startAnimating(4);
+
+function startAnimating(fps) {
+    fpsInterval = 1000 / fps;
+    then = Date.now();
+    startTime = then;
+    console.log(startTime);
+    animate();
+}
+
+
+function animate() {
+
+    // stop
+    if (stop) {
+        return;
+    }
+
+    // request another frame
+
+    requestAnimationFrame(animate);
+
+    // calc elapsed time since last loop
+
+    now = Date.now();
+    elapsed = now - then;
+
+    // if enough time has elapsed, draw the next frame
+
+    if (elapsed > fpsInterval) {
+
+        // Get ready for next frame by setting then=now, but...
+        // Also, adjust for fpsInterval not being multiple of 16.67
+        then = now - (elapsed % fpsInterval);
+
+        ctx.clearRect(0, 0, boardSize, boardSize);
+
+
+        // TESTING...Report #seconds since start and achieved fps.
+        var sinceStart = now - startTime;
+        var currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;
+    }
+}
