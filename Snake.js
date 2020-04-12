@@ -102,3 +102,51 @@ const canvas = document.querySelector('canvas');
 canvas.width = boardSize;
 canvas.height = boardSize;
 const ctx = canvas.getContext('2d');
+
+class Snake {
+  constructor () {
+    this.body = [[0, 0]];
+    this.direction = [1, 0];
+  }
+
+  attachHead () {
+    const head = this.body[0];
+    const newHead = head.map( (el, idx) => el+this.direction[idx])
+    this.body.unshift(newHead);
+  }
+
+  cutTail () {
+    this.body.pop();
+  }
+}
+
+class Food {
+  constructor () {
+    this.x = Math.floor(Math.random() * tileAmount);
+    this.y = Math.floor(Math.random() * tileAmount);
+  }
+}
+
+class Setup {
+  constructor () {
+    this.snake = new Snake();
+    this.food = new Food();
+  }
+
+  snakeIsOnFood () {
+    return this.snake.some( el => el[0] === food.x && el[1] === food.y );
+  }
+
+  generateFood () {
+    this.food = new Food();
+  }
+
+  nextMove () {
+    this.snake.attachHead();
+    if (!snakeIsOnFood()) {
+      this.snake.cutTail();
+    } else {
+      generateFood();
+    }
+  }
+}
