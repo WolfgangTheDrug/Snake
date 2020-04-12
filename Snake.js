@@ -96,7 +96,7 @@ const pallette = [
 
 const tileSize = 12;  // highly composite number!
 const tileAmount = 60; // highly composite number!
-const boardSize = tileSize * tileAmount; //highly composite number!
+const boardSize = tileSize * tileAmount; // highly composite number!
 
 const canvas = document.querySelector('canvas');
 canvas.width = boardSize;
@@ -121,6 +121,10 @@ document.onkeydown = function (e) {
       break;
   }
 };
+const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || // some formalities
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+const cancelAnimationFrame =  window.cancelAnimationFrame || window.mozCancelAnimationFrame;
+let myReq;
 
 class Snake {
   constructor () {
@@ -158,6 +162,13 @@ class Setup {
     this.food = new Food();
   }
 
+  snakeIsOnItself () {
+    const tail = this.snake.body.slice(1);
+    const head = this.snake.body[0];
+
+    return tail.some( el => el[0] === head[0] && el[1] === head[1] );
+  }
+
   snakeIsOnFood () {
     return this.snake.body.some( el => el[0] === this.food.x*tileSize && el[1] === this.food.y*tileSize );
   }
@@ -168,11 +179,15 @@ class Setup {
 
   nextMove () {
     this.snake.attachHead();
-    if (!this.snakeIsOnFood()) {
+    if (this.snakeIsOnItself()) {
+      return false;
+    } else if (!this.snakeIsOnFood()) {
       this.snake.cutTail();
     } else {
       this.generateFood();
     }
+
+    return true;
   }
 }
 
@@ -182,6 +197,7 @@ class Game {
     this.counter = 0;
     this.difficultyLvl = 1;
     this.maxDifficultyLvl = 99;
+    this.gameOver = false;
   }
 
   updateDifficultyLvl () {
@@ -215,27 +231,37 @@ class Game {
 const g = new Game();
 (animate = function () {
 
-  let lvlUp = 10 - Math.floor(g.difficultyLvl/10);
-  if (++g.counter % lvlUp === 0) {
-    ctx.clearRect(0, 0, boardSize, boardSize);
-    g.setup.snake.direction = direction;
-    g.drawSnake(g.counter);
-
-
-    g.setup.nextMove();
-    g.updateDifficultyLvl();
-    g.drawFood(g.counter%4);
-    g.counter %= 100;
+  if (!g.gameOver) {
+    let lvlUp = 10 - Math.floor(g.difficultyLvl/10);
+    if (++g.counter % lvlUp === 0) {
+      ctx.clearRect(0, 0, boardSize, boardSize);
+      g.setup.snake.direction = direction;
+      g.drawSnake(g.counter);
+      g.gameOver = !g.setup.nextMove();
+      g.updateDifficultyLvl();
+      g.drawFood(g.counter%4);
+      g.counter %= 100;
+    }
+    myReq = requestAnimationFrame(animate);
+  } else {
+    cancelAnimationFrame(myReq);
+    alert('Game Over');
   }
-  requestAnimationFrame(animate);
 
 })();
 
 /*
   to do:
     - self-collision detection
+        -- done
     - optimizing drawing functions
-    - trippy bug -- kinda done
-    - game gaining speed with snake eating Food -- kinda done
+    - trippy bg
+    -trippy snake
+        -- kinda done
+    - game gaining speed with snake eating Food
+        -- kinda done
     - change food to snack
+    - game over screen
+    - division into smaller modules
+    - score board on the side
 */
