@@ -83,12 +83,12 @@ const crimson = {
     ]
 };
 
-const pallette = {
-  yellowGreen: yellowGreen,
-  skyBlue: skyBlue,
-  slateBlue: slateBlue,
-  crimson: crimson
-};
+const pallette = [
+  yellowGreen,
+  skyBlue,
+  slateBlue,
+  crimson
+];
 
 /* ******************* *
  *   Pallette: STOP    *
@@ -180,13 +180,20 @@ class Game {
   constructor () {
     this.setup = new Setup();
     this.counter = 0;
+    this.difficultyLvl = 1;
+    this.maxDifficultyLvl = 99;
+  }
+
+  updateDifficultyLvl () {
+    const len = this.setup.snake.body.length;
+    this.difficultyLvl = len <= this.maxDifficultyLvl? len : this.maxDifficultyLvl ;
   }
 
   drawSnake (colorCounter = 1) {
     let colorComponent = 1;
     this.setup.snake.body.forEach (el => {
-      ctx.strokeStyle = pallette.yellowGreen.neutral[colorCounter%3];
-      ctx.fillStyle = pallette.yellowGreen.neutral[(colorCounter-colorComponent)%3];
+      ctx.strokeStyle = pallette[(0+colorCounter)%4].light[colorCounter%3];
+      ctx.fillStyle = pallette[(0+colorCounter)%4].light[(colorCounter-colorComponent)%3];
       ctx.beginPath();
       ctx.rect(el[0], el[1], tileSize, tileSize);
       ctx.fill();
@@ -196,8 +203,8 @@ class Game {
   }
 
   drawFood (colorCounter = 1) {
-    ctx.strokeStyle = pallette.skyBlue.dark[colorCounter%3];
-    ctx.fillStyle = pallette.skyBlue.dark[(colorCounter+1)%3];
+    ctx.strokeStyle = pallette[1].dark[colorCounter%3];
+    ctx.fillStyle = pallette[1].dark[(colorCounter+1)%3];
     ctx.beginPath();
     ctx.rect(this.setup.food.x*tileSize, this.setup.food.y*tileSize, tileSize, tileSize);
     ctx.fill();
@@ -208,16 +215,27 @@ class Game {
 const g = new Game();
 (animate = function () {
 
-  if (++g.counter % 5 === 0) {
+  let lvlUp = 10 - Math.floor(g.difficultyLvl/10);
+  if (++g.counter % lvlUp === 0) {
     ctx.clearRect(0, 0, boardSize, boardSize);
     g.setup.snake.direction = direction;
     g.drawSnake(g.counter);
 
-    console.log(g.setup.snake.direction);
+
     g.setup.nextMove();
-    g.drawFood(g.counter*4);
+    g.updateDifficultyLvl();
+    g.drawFood(g.counter%4);
     g.counter %= 100;
   }
   requestAnimationFrame(animate);
 
 })();
+
+/*
+  to do:
+    - self-collision detection
+    - optimizing drawing functions
+    - trippy bug -- kinda done
+    - game gaining speed with snake eating Food -- kinda done
+    - change food to snack
+*/
