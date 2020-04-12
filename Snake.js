@@ -103,6 +103,25 @@ canvas.width = boardSize;
 canvas.height = boardSize;
 const ctx = canvas.getContext('2d');
 
+let direction = [0, 1];
+
+document.onkeydown = function (e) {
+  switch (e.key) {
+    case 'ArrowUp':
+      direction = [0, -1];
+      break;
+    case 'ArrowDown':
+      direction = [0,  1];
+      break;
+    case 'ArrowLeft':
+      direction = [-1, 0];
+      break;
+    case 'ArrowRight':
+      direction = [1,  0];
+      break;
+  }
+};
+
 class Snake {
   constructor () {
     this.body = [[0, 0]];
@@ -111,13 +130,19 @@ class Snake {
 
   attachHead () {
     const head = this.body[0];
-    const newHead = head.map( (el, idx) => el+this.direction[idx])
+    const newHead = head.map( (el, idx) => {
+      let result = (el+this.direction[idx]*tileSize)%boardSize;
+      if (result < 0)
+        result = boardSize;
+      return result;
+    });
     this.body.unshift(newHead);
   }
 
   cutTail () {
     this.body.pop();
   }
+
 }
 
 class Food {
@@ -134,7 +159,7 @@ class Setup {
   }
 
   snakeIsOnFood () {
-    return this.snake.some( el => el[0] === food.x && el[1] === food.y );
+    return this.snake.body.some( el => el[0] === this.food.x*tileSize && el[1] === this.food.y*tileSize );
   }
 
   generateFood () {
@@ -143,10 +168,56 @@ class Setup {
 
   nextMove () {
     this.snake.attachHead();
-    if (!snakeIsOnFood()) {
+    if (!this.snakeIsOnFood()) {
       this.snake.cutTail();
     } else {
-      generateFood();
+      this.generateFood();
     }
   }
 }
+
+class Game {
+  constructor () {
+    this.setup = new Setup();
+    this.counter = 0;
+  }
+
+  drawSnake (colorCounter = 1) {
+    let colorComponent = 1;
+    this.setup.snake.body.forEach (el => {
+      ctx.strokeStyle = pallette.yellowGreen.neutral[colorCounter%3];
+      ctx.fillStyle = pallette.yellowGreen.neutral[(colorCounter-colorComponent)%3];
+      ctx.beginPath();
+      ctx.rect(el[0], el[1], tileSize, tileSize);
+      ctx.fill();
+      ctx.stroke();
+      colorComponent++;
+    })
+  }
+
+  drawFood (colorCounter = 1) {
+    ctx.strokeStyle = pallette.skyBlue.dark[colorCounter%3];
+    ctx.fillStyle = pallette.skyBlue.dark[(colorCounter+1)%3];
+    ctx.beginPath();
+    ctx.rect(this.setup.food.x*tileSize, this.setup.food.y*tileSize, tileSize, tileSize);
+    ctx.fill();
+    ctx.stroke();
+  }
+}
+
+const g = new Game();
+(animate = function () {
+
+  if (++g.counter % 5 === 0) {
+    ctx.clearRect(0, 0, boardSize, boardSize);
+    g.setup.snake.direction = direction;
+    g.drawSnake(g.counter);
+
+    console.log(g.setup.snake.direction);
+    g.setup.nextMove();
+    g.drawFood(g.counter*4);
+    g.counter %= 100;
+  }
+  requestAnimationFrame(animate);
+
+})();
