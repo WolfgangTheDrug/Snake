@@ -153,6 +153,7 @@ class Food {
   constructor () {
     this.x = Math.floor(Math.random() * tileAmount);
     this.y = Math.floor(Math.random() * tileAmount);
+    this.position = [this.x, this.y];
   }
 }
 
@@ -197,6 +198,7 @@ class Game {
     this.counter = 0;
     this.difficultyLvl = 1;
     this.maxDifficultyLvl = 99;
+    this.hardModeIsOn = false;
     this.gameOver = false;
   }
 
@@ -208,8 +210,8 @@ class Game {
   drawSnake (colorCounter = 1) {
     let colorComponent = 1;
     this.setup.snake.body.forEach (el => {
-      ctx.strokeStyle = pallette[(0+colorCounter)%4].light[colorCounter%3];
-      ctx.fillStyle = pallette[(0+colorCounter)%4].light[(colorCounter-colorComponent)%3];
+      ctx.strokeStyle = pallette[colorCounter%4].light[colorCounter%3];
+      ctx.fillStyle = pallette[colorCounter%4].light[(colorCounter-colorComponent)%3];
       ctx.beginPath();
       ctx.rect(el[0], el[1], tileSize, tileSize);
       ctx.fill();
@@ -234,14 +236,26 @@ const g = new Game();
   if (!g.gameOver) {
     let lvlUp = 10 - Math.floor(g.difficultyLvl/10);
     if (++g.counter % lvlUp === 0) {
+
       ctx.clearRect(0, 0, boardSize, boardSize);
+      ctx.beginPath();
+      if (lvlUp <= 1) { // hard mode
+        ctx.fillStyle = pallette[1+(g.counter/50 > Math.sin(g.counter))].dark[g.counter%2];
+      } else {
+        ctx.fillStyle = pallette[1].light[0];
+      }
+      ctx.fillRect(0, 0, boardSize, boardSize);
+      ctx.stroke();
+
       g.setup.snake.direction = direction;
       g.drawSnake(g.counter);
       g.gameOver = !g.setup.nextMove();
       g.updateDifficultyLvl();
       g.drawFood(g.counter%4);
+
       g.counter %= 100;
     }
+
     myReq = requestAnimationFrame(animate);
   } else {
     cancelAnimationFrame(myReq);
@@ -255,8 +269,9 @@ const g = new Game();
     - self-collision detection
         -- done
     - optimizing drawing functions
+        -- nah
     - trippy bg
-    -trippy snake
+    - trippy snake
         -- kinda done
     - game gaining speed with snake eating Food
         -- kinda done
