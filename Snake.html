@@ -3,20 +3,43 @@
   <head>
     <meta charset="utf-8">
     <title>Basic Canvas Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Girassol&family=Indie+Flower&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="Snake.css"></link>
     <script type="text/javascript" src="Snake.js" defer></script>
   </head>
-  <body>
+  <body class="grid-container">
+
+    <header class="center">
+        <h1>
+          <span class="indieflower-font">Trippy</span><br>
+          Snake Game
+        </h1>
+    </header>
+
     <main>
-      <section class="board main-grid-container">
+      <section class="board center">
         <canvas></canvas>
       </section>
-
-      <section class="modal modal-bg">
-        <article class="">
-
-        </article>
-      </section>
     </main>
+
+    <aside>
+      <article class="progress">
+        <p class="grid-container">Score: <span id="score"> </span></p>
+        <p class="grid-container">Level: <span id="level"></span> </p>
+        <p class="grid-container">Hard Mode: <span id="hardmode"></span> </p>
+      </article>
+    </aside>
+
+    <footer class="invisible">
+      <article class="modal">
+        <h2>Game Over</h2>
+        <p>
+          <button type="button" name="button" onclick="reset()">
+              RESET
+          </button>
+        </p>
+      </article>
+    </footer>
+
   </body>
 </html>

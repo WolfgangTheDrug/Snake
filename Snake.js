@@ -230,19 +230,33 @@ class Game {
   }
 }
 
-const g = new Game();
-(animate = function () {
+let g = new Game();
+
+const score = document.getElementById('score');
+const level = document.getElementById('level');
+const hardmode = document.getElementById('hardmode');
+
+const reset = function () {
+  g = new Game();
+  document.getElementsByTagName('footer')[0].className = "invisible";
+  animate();
+};
+
+animate = function () {
 
   if (!g.gameOver) {
     let lvlUp = 10 - Math.floor(g.difficultyLvl/10);
     if (++g.counter % lvlUp === 0) {
+      score.innerHTML = g.setup.snake.body.length;
+      level.innerHTML = 11-lvlUp;
+      hardmode.innerHTML = this.hardModeIsOn? 'ON' : 'OFF';
 
       ctx.clearRect(0, 0, boardSize, boardSize);
       ctx.beginPath();
       if (lvlUp <= 1) { // hard mode
         ctx.fillStyle = pallette[1+(g.counter/50 > Math.sin(g.counter))].dark[g.counter%2];
       } else {
-        ctx.fillStyle = pallette[1].light[0];
+        ctx.fillStyle = pallette[1].neutral[0];
       }
       ctx.fillRect(0, 0, boardSize, boardSize);
       ctx.stroke();
@@ -259,10 +273,12 @@ const g = new Game();
     myReq = requestAnimationFrame(animate);
   } else {
     cancelAnimationFrame(myReq);
-    alert('Game Over');
+    document.getElementsByTagName('footer')[0].className = "";
   }
 
-})();
+}
+
+animate();
 
 /*
   to do:
